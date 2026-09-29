@@ -66,6 +66,40 @@ adb shell "su -c 'cat /data/data/com.supercell.clashofclans/files/logfile.log'"
 
 The log should contain `[timestamp] done with init`. Once the game has loaded, it should also contain JSON dumps.
 
+## PoC
+
+After opening a player profile (`am start -a android.intent.action.VIEW -d "clashofclans://OpenPlayerProfile?tag=<TAG>"`), the log file contains that village's full JSON. This is a trimmed capture, with `...` marking removed parts:
+
+```json
+{"wave_num":4,"npc_maps_seen":{"bits":[0,0,262144,0,0,0,0]},"unlocked_gem_layouts":0,"active_layout":0,
+ "buildings":[
+   {"data":1000001,"id":500000000,"lvl":4,"x":23,"y":18,"hp":0,"reg":false},
+   {"data":1000004,"id":500000001,"lvl":9,"x":20,"y":25,"hp":0,"reg":false,"res_time":93033},
+   ...
+ ],
+ "obstacles":[
+   {"data":8000005,"id":503000001,"x":40,"y":21},
+   {"data":8000003,"id":503000003,"x":32,"y":37},
+   ...
+   {"data":8000029,"id":503000416,"x":31,"y":24,"tc":1},
+   ...
+   {"data":8000009,"id":503000629,"x":20,"y":40,"tc":1}
+ ],
+ "decos":[{"data":18000001,"id":506000000,"x":26,"y":33,"ai":0,"miniLeveled":false,"ed":false}],
+ "respawnVars":{"secondsFromLastRespawn":64130,"obstacleClearCounter":13,"time_to_gembox_drop":658426,...},
+ ...}
+```
+
+The JSON is followed by non-printable bytes from the rest of the freed block, written as dots (`.`) in the log. `main.py` parses only the `"obstacles"` array with `json.JSONDecoder().raw_decode`, so the trailing bytes are ignored.
+
+Each obstacle is `{"data": <obstacle type ID>, "id": <instance ID>, "x": .., "y": ..}`. `main.py` counts the `data` values it watches (`8000015`, `8000021`, `8000028`). The capture above contains one `8000015` (`{"data":8000015,"id":503000039,"x":11,"y":25}`) and none of the other two.
+
+Confirm it yourself:
+
+```bash
+adb shell "su -c 'cat /data/data/com.supercell.clashofclans/files/logfile.log'" | grep -o '"data":8000015'
+```
+
 ## Troubleshooting
 
 | Log message / symptom                     | Cause                                                             |
