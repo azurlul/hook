@@ -7,10 +7,6 @@
 //
 // Build (needs Zydis):
 //   clang -shared -fPIC -O2 azurlul.c -o azurlul.so -lZydis -ldl -lpthread
-//
-// The only behavioral change vs. the decompiled original is a fast-path in the
-// free() hook (a single leading-byte test before the expensive
-// malloc_usable_size() call). The set of blocks that get logged is identical.
 
 #define _GNU_SOURCE
 #include <dlfcn.h>
