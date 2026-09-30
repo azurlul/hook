@@ -20,7 +20,7 @@ The detour runs on every `free()`:
 - If the block starts with `{"wave_num":` or `{"npc_maps_seen":{`, the log file is truncated and the block is written to it, with non-printable bytes replaced by `.`.
 - It then calls the original `free()` through the trampoline.
 
-The log therefore always holds the most recent matching dump, which is what the Python side polls for.
+The log therefore always holds the most recent matching dump.
 
 ## Files
 
@@ -42,8 +42,6 @@ cd Source
 .\build.ps1 -NdkPath D:\android-ndk
 ```
 
-Copy the resulting `azurlul.so` to `../lib/azurlul.so`.
-
 Manual build with clang:
 
 ```bash
@@ -51,8 +49,6 @@ clang --target=x86_64-linux-android24 -shared -fPIC -O2 azurlul.c Zydis.c -I. -o
 ```
 
 ## Manual test
-
-Without the Python script:
 
 ```bash
 adb push azurlul.so /data/local/tmp/azurlul.so
@@ -90,15 +86,7 @@ After opening a player profile (`am start -a android.intent.action.VIEW -d "clas
  ...}
 ```
 
-The JSON is followed by non-printable bytes from the rest of the freed block, written as dots (`.`) in the log. `main.py` parses only the `"obstacles"` array with `json.JSONDecoder().raw_decode`, so the trailing bytes are ignored.
-
-Each obstacle is `{"data": <obstacle type ID>, "id": <instance ID>, "x": .., "y": ..}`. `main.py` counts the `data` values it watches (`8000015`, `8000021`, `8000028`). The capture above contains one `8000015` (`{"data":8000015,"id":503000039,"x":11,"y":25}`) and none of the other two.
-
-Confirm it yourself:
-
-```bash
-adb shell "su -c 'cat /data/data/com.supercell.clashofclans/files/logfile.log'" | grep -o '"data":8000015'
-```
+The JSON is followed by non-printable bytes from the rest of the freed block, written as dots (`.`) in the log.
 
 ## Troubleshooting
 
