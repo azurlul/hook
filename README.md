@@ -1,6 +1,6 @@
 # Hook
 
-Native hook library (`azurlul.so`) used by https://github.com/azurlul/obs. Once loaded into Clash of Clans, it writes the game's large freed JSON buffers to a log file, which `main.py` reads over ADB.
+Native hook library (`azurlul.so`) used by https://github.com/azurlul/obs. Once loaded into Clash of Clans, it writes the game's large freed JSON buffers to a log file which you can read over ADB.
 
 Target: **x86-64 Android (bionic)**. Other ABIs can be built, but the hook's instruction-relocation code has only been written and tested for x86-64.
 
