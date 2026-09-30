@@ -6,7 +6,7 @@ Target: **x86-64 Android (bionic)**. Other ABIs can be built, but the hook's ins
 
 ## How it works
 
-The library loads through `LD_PRELOAD` (set by `main.py` with the `wrap.com.supercell.clashofclans` property), so its constructor runs at process start:
+The library loads through `LD_PRELOAD`, so its constructor runs at process start:
 
 1. Opens `/data/user/0/com.supercell.clashofclans/files/logfile.log` in append mode.
 2. Finds libc's executable mapping and resolves `free()` and `malloc_usable_size()`.
